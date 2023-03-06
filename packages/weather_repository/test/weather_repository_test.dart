@@ -46,6 +46,143 @@ void main() {
         expect(
             () async => weatherRepository.getWeather(city), throwsA(exception));
       });
+
+      test('calls getWeather with correct latitude/longitude', () async {
+        final location = MockLocation();
+
+        when(() => location.latitude).thenReturn(latitude);
+        when(() => location.longitude).thenReturn(longitude);
+        when(() => weatherApiClient.locationSearch(any()))
+            .thenAnswer((_) async => location);
+
+        try {
+          await weatherRepository.getWeather(city);
+        } catch (_) {}
+
+        verify(
+          () => weatherApiClient.getWeather(
+              latitude: latitude, longitude: longitude),
+        ).called(1);
+      });
+
+      test('throws when getWeather fails', () async {
+        final exception = Exception('oops');
+        final location = MockLocation();
+        when(() => location.latitude).thenReturn(latitude);
+        when(() => location.longitude).thenReturn(longitude);
+        when(() => weatherApiClient.locationSearch(any())).thenAnswer(
+          (_) async => location,
+        );
+        when(() => weatherApiClient.getWeather(
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'))).thenThrow(exception);
+
+        expect(
+            () async => weatherRepository.getWeather(city), throwsA(exception));
+      });
+
+      test('returns correct weather on success (clear)', () async {
+        final location = MockLocation();
+        final weather = MockWeather();
+        when(() => location.name).thenReturn(city);
+        when(() => location.latitude).thenReturn(latitude);
+        when(() => location.longitude).thenReturn(longitude);
+        when(() => weather.temperature).thenReturn(42.42);
+        when(() => weather.weatherCode).thenReturn(0);
+        when(() => weatherApiClient.locationSearch(any())).thenAnswer(
+          (_) async => location,
+        );
+        when(
+          () => weatherApiClient.getWeather(
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+          ),
+        ).thenAnswer((_) async => weather);
+        final actual = await weatherRepository.getWeather(city);
+        expect(
+            actual,
+            Weather(
+                location: city,
+                temperature: 42.42,
+                condition: WeatherCondition.clear));
+      });
+
+      test('returns correct weather on success (rainy)', () async {
+        final location = MockLocation();
+        final weather = MockWeather();
+        when(() => location.name).thenReturn(city);
+        when(() => location.latitude).thenReturn(latitude);
+        when(() => location.longitude).thenReturn(longitude);
+        when(() => weather.temperature).thenReturn(42.42);
+        when(() => weather.weatherCode).thenReturn(51);
+        when(() => weatherApiClient.locationSearch(any())).thenAnswer(
+          (_) async => location,
+        );
+        when(
+          () => weatherApiClient.getWeather(
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+          ),
+        ).thenAnswer((_) async => weather);
+        final actual = await weatherRepository.getWeather(city);
+        expect(
+            actual,
+            Weather(
+                location: city,
+                temperature: 42.42,
+                condition: WeatherCondition.rainy));
+      });
+
+      test('returns correct weather on success (snowy)', () async {
+        final location = MockLocation();
+        final weather = MockWeather();
+        when(() => location.name).thenReturn(city);
+        when(() => location.latitude).thenReturn(latitude);
+        when(() => location.longitude).thenReturn(longitude);
+        when(() => weather.temperature).thenReturn(42.42);
+        when(() => weather.weatherCode).thenReturn(71);
+        when(() => weatherApiClient.locationSearch(any())).thenAnswer(
+          (_) async => location,
+        );
+        when(
+          () => weatherApiClient.getWeather(
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+          ),
+        ).thenAnswer((_) async => weather);
+        final actual = await weatherRepository.getWeather(city);
+        expect(
+            actual,
+            Weather(
+                location: city,
+                temperature: 42.42,
+                condition: WeatherCondition.snowy));
+      });
+      test('returns correct weather on success (unknown)', () async {
+        final location = MockLocation();
+        final weather = MockWeather();
+        when(() => location.name).thenReturn(city);
+        when(() => location.latitude).thenReturn(latitude);
+        when(() => location.longitude).thenReturn(longitude);
+        when(() => weather.temperature).thenReturn(42.42);
+        when(() => weather.weatherCode).thenReturn(-1);
+        when(() => weatherApiClient.locationSearch(any())).thenAnswer(
+          (_) async => location,
+        );
+        when(
+          () => weatherApiClient.getWeather(
+            latitude: any(named: 'latitude'),
+            longitude: any(named: 'longitude'),
+          ),
+        ).thenAnswer((_) async => weather);
+        final actual = await weatherRepository.getWeather(city);
+        expect(
+            actual,
+            Weather(
+                location: city,
+                temperature: 42.42,
+                condition: WeatherCondition.unknown));
+      });
     });
   });
 }
