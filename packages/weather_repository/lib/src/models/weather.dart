@@ -26,6 +26,9 @@ class Weather extends Equatable {
   factory Weather.fromJson(Map<String, dynamic> json) =>
       _$WeatherFromJson(json);
 
+  Map<String, dynamic> toJson() => _$WeatherToJson(this);
+
+
   @override
   List<Object?> get props => [location, temperature, condition];
 }
