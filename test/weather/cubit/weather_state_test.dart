@@ -1,12 +1,11 @@
 // ignore_for_file: prefer_const_constructors
-import 'package:bloc_test/bloc_test.dart';
 import 'package:bloc_weather/weather/weather.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 import 'package:weather_repository/weather_repository.dart'
-as weather_repository;
+    as weather_repository;
 
-import '../helper/hydrated_bloc.dart';
+import '../../helper/hydrated_bloc.dart';
 
 const weatherLocation = 'London';
 const weatherCondition = weather_repository.WeatherCondition.rainy;
@@ -17,15 +16,13 @@ class MockWeatherRepository extends Mock
 
 class MockWeather extends Mock implements weather_repository.Weather {}
 
-
-void main(){
+void main() {
   initHydrationStorage();
 
   group('WeatherCubit', () {
     late weather_repository.Weather weather;
     late weather_repository.WeatherRepository weatherRepository;
     late WeatherCubit weatherCubit;
-
 
     setUp(() async {
       weather = MockWeather();
@@ -34,19 +31,9 @@ void main(){
       when(() => weather.location).thenReturn(weatherLocation);
       when(() => weather.temperature).thenReturn(weatherTemperature);
       when(
-            () => weatherRepository.getWeather(any()),
+        () => weatherRepository.getWeather(any()),
       ).thenAnswer((_) async => weather);
       weatherCubit = WeatherCubit(weatherRepository);
     });
-
-
-
-
-
   });
-
-
-
-
-
 }
